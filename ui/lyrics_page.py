@@ -5,7 +5,7 @@
 from typing import List, Optional
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QFrame,
-    QScrollArea, QGraphicsOpacityEffect
+    QScrollArea, QGraphicsOpacityEffect, QSlider
 )
 from PyQt6.QtCore import Qt, QTimer, QPropertyAnimation, QEasingCurve, pyqtSignal
 from PyQt6.QtGui import QFont, QPixmap, QPainter, QBrush, QColor, QPainterPath
@@ -267,8 +267,15 @@ class LyricsDisplayWidget(QFrame):
 class LyricsPage(QWidget):
     """精美歌词页面 - 完整页面布局"""
     
+    # 定义音量改变信号
+    volume_changed = pyqtSignal(int)
+    
     def __init__(self, parent=None):
         super().__init__(parent)
+        # 从设置中读取保存的音量
+        from PyQt6.QtCore import QSettings
+        self._settings = QSettings("MultiTrackPlayer", "Settings")
+        self._saved_volume = self._settings.value("lyrics_page_volume", 80, type=int)
         self.setup_ui()
         
     def setup_ui(self):
@@ -312,6 +319,41 @@ class LyricsPage(QWidget):
         self.album_label.setStyleSheet("color: #707070;")
         info_layout.addWidget(self.album_label)
         
+        # 音量控制
+        volume_layout = QHBoxLayout()
+        volume_layout.setSpacing(10)
+        
+        volume_icon = QLabel("🔊")
+        volume_icon.setStyleSheet("color: #a0a0a0; font-size: 16px;")
+        volume_layout.addWidget(volume_icon)
+        
+        self.volume_slider = QSlider(Qt.Orientation.Horizontal)
+        self.volume_slider.setRange(0, 100)
+        self.volume_slider.setValue(self._saved_volume)
+        self.volume_slider.setFixedWidth(150)
+        self.volume_slider.setStyleSheet("""
+            QSlider::groove:horizontal { 
+                background: #3a3a4a; height: 6px; border-radius: 3px; 
+            }
+            QSlider::handle:horizontal { 
+                background: #7c5ce0; width: 14px; height: 14px; 
+                margin: -4px 0; border-radius: 7px; 
+            }
+            QSlider::sub-page:horizontal { 
+                background: #5a3eb8; border-radius: 3px; 
+            }
+        """)
+        self.volume_slider.valueChanged.connect(self._on_volume_changed)
+        volume_layout.addWidget(self.volume_slider)
+        
+        self.volume_label = QLabel(f"{self._saved_volume}%")
+        self.volume_label.setStyleSheet("color: #a0a0a0; font-size: 12px; min-width: 35px;")
+        volume_layout.addWidget(self.volume_label)
+        
+        volume_layout.addStretch()
+        info_layout.addSpacing(20)
+        info_layout.addLayout(volume_layout)
+        
         info_layout.addStretch()
         top_layout.addLayout(info_layout, 1)
         
@@ -327,6 +369,14 @@ class LyricsPage(QWidget):
         # 歌词显示
         self.lyrics_widget = LyricsDisplayWidget()
         layout.addWidget(self.lyrics_widget, 1)
+    
+    def _on_volume_changed(self, value: int):
+        """音量改变时保存并发出信号"""
+        self.volume_label.setText(f"{value}%")
+        # 保存到设置
+        self._settings.setValue("lyrics_page_volume", value)
+        # 发出信号通知主窗口
+        self.volume_changed.emit(value)
         
     def set_song(self, title: str, artist: str, album: str = ""):
         """设置歌曲信息"""
@@ -345,6 +395,17 @@ class LyricsPage(QWidget):
     def update_position(self, position_ms: int):
         """更新播放位置"""
         self.lyrics_widget.update_position(position_ms)
+    
+    def get_volume(self) -> int:
+        """获取当前音量"""
+        return self.volume_slider.value()
+    
+    def set_volume(self, volume: int):
+        """设置音量（不触发信号）"""
+        self.volume_slider.blockSignals(True)
+        self.volume_slider.setValue(volume)
+        self.volume_label.setText(f"{volume}%")
+        self.volume_slider.blockSignals(False)
 
 
 class SimpleLyricsWidget(QFrame):

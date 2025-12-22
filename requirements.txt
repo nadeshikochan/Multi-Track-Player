@@ -1,4 +1,0 @@
-PyQt6>=6.4.0
-mutagen>=1.46.0
-pygame>=2.0.0
-pydub>=0.25.0

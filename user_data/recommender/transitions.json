@@ -1,0 +1,354 @@
+{
+  "F:/音乐文件\\MusicDownloader\\ogg_music\\bermei.inazawa - 共存.ogg->F:/音乐文件\\lx.music\\part2\\No.1.mp3": {
+    "from_song": "F:/音乐文件\\MusicDownloader\\ogg_music\\bermei.inazawa - 共存.ogg",
+    "to_song": "F:/音乐文件\\lx.music\\part2\\No.1.mp3",
+    "good_count": 1,
+    "neutral_count": 0,
+    "bad_count": 4,
+    "last_update": 1766388566.7936232
+  },
+  "F:/音乐文件\\lx.music\\part2\\No.1.mp3->F:/音乐文件\\MusicDownloader\\ogg_music\\bermei.inazawa - 共存.ogg": {
+    "from_song": "F:/音乐文件\\lx.music\\part2\\No.1.mp3",
+    "to_song": "F:/音乐文件\\MusicDownloader\\ogg_music\\bermei.inazawa - 共存.ogg",
+    "good_count": 1,
+    "neutral_count": 0,
+    "bad_count": 3,
+    "last_update": 1766383980.086024
+  },
+  "F:/音乐文件\\MusicDownloader\\ogg_music\\bermei.inazawa - 共存.ogg->F:/音乐文件\\lx.music\\part1\\cutie conductor - project lights.flac": {
+    "from_song": "F:/音乐文件\\MusicDownloader\\ogg_music\\bermei.inazawa - 共存.ogg",
+    "to_song": "F:/音乐文件\\lx.music\\part1\\cutie conductor - project lights.flac",
+    "good_count": 0,
+    "neutral_count": 0,
+    "bad_count": 1,
+    "last_update": 1766383759.827731
+  },
+  "F:/音乐文件\\lx.music\\part1\\cutie conductor - project lights.flac->F:/音乐文件\\lx.music\\part2\\No.1.mp3": {
+    "from_song": "F:/音乐文件\\lx.music\\part1\\cutie conductor - project lights.flac",
+    "to_song": "F:/音乐文件\\lx.music\\part2\\No.1.mp3",
+    "good_count": 0,
+    "neutral_count": 0,
+    "bad_count": 1,
+    "last_update": 1766383760.9480758
+  },
+  "F:/音乐文件\\lx.music\\part1\\20才の約束 - 鈴木みのり.flac->F:/音乐文件\\lx.music\\part1\\cutie conductor - project lights.flac": {
+    "from_song": "F:/音乐文件\\lx.music\\part1\\20才の約束 - 鈴木みのり.flac",
+    "to_song": "F:/音乐文件\\lx.music\\part1\\cutie conductor - project lights.flac",
+    "good_count": 0,
+    "neutral_count": 0,
+    "bad_count": 1,
+    "last_update": 1766385155.626318
+  },
+  "F:/音乐文件\\lx.music\\part1\\cutie conductor - project lights.flac->F:/音乐文件\\MusicDownloader\\ogg_music\\bermei.inazawa - 共存.ogg": {
+    "from_song": "F:/音乐文件\\lx.music\\part1\\cutie conductor - project lights.flac",
+    "to_song": "F:/音乐文件\\MusicDownloader\\ogg_music\\bermei.inazawa - 共存.ogg",
+    "good_count": 1,
+    "neutral_count": 0,
+    "bad_count": 0,
+    "last_update": 1766385182.8738372
+  },
+  "F:/音乐文件\\lx.music\\part2\\No.1.mp3->F:/音乐文件\\lx.music\\part1\\cutie conductor - project lights.flac": {
+    "from_song": "F:/音乐文件\\lx.music\\part2\\No.1.mp3",
+    "to_song": "F:/音乐文件\\lx.music\\part1\\cutie conductor - project lights.flac",
+    "good_count": 0,
+    "neutral_count": 0,
+    "bad_count": 2,
+    "last_update": 1766388567.1100824
+  },
+  "F:/音乐文件\\lx.music\\part1\\cutie conductor - project lights.flac->F:/音乐文件\\lx.music\\part1\\20才の約束 - 鈴木みのり.flac": {
+    "from_song": "F:/音乐文件\\lx.music\\part1\\cutie conductor - project lights.flac",
+    "to_song": "F:/音乐文件\\lx.music\\part1\\20才の約束 - 鈴木みのり.flac",
+    "good_count": 0,
+    "neutral_count": 0,
+    "bad_count": 3,
+    "last_update": 1766388567.5538688
+  },
+  "F:/音乐文件\\lx.music\\part1\\20才の約束 - 鈴木みのり.flac->F:/音乐文件\\lx.music\\part2\\No.1.mp3": {
+    "from_song": "F:/音乐文件\\lx.music\\part1\\20才の約束 - 鈴木みのり.flac",
+    "to_song": "F:/音乐文件\\lx.music\\part2\\No.1.mp3",
+    "good_count": 0,
+    "neutral_count": 0,
+    "bad_count": 1,
+    "last_update": 1766385215.8219771
+  },
+  "F:/音乐文件\\lx.music\\part2\\No.1.mp3->F:/音乐文件\\lx.music\\part1\\Cherish you - 矢作紗友里.flac": {
+    "from_song": "F:/音乐文件\\lx.music\\part2\\No.1.mp3",
+    "to_song": "F:/音乐文件\\lx.music\\part1\\Cherish you - 矢作紗友里.flac",
+    "good_count": 0,
+    "neutral_count": 0,
+    "bad_count": 1,
+    "last_update": 1766385216.9870536
+  },
+  "F:/音乐文件\\lx.music\\part1\\Cherish you - 矢作紗友里.flac->F:/音乐文件\\lx.music\\part1\\cutie conductor - project lights.flac": {
+    "from_song": "F:/音乐文件\\lx.music\\part1\\Cherish you - 矢作紗友里.flac",
+    "to_song": "F:/音乐文件\\lx.music\\part1\\cutie conductor - project lights.flac",
+    "good_count": 0,
+    "neutral_count": 0,
+    "bad_count": 1,
+    "last_update": 1766385217.8231742
+  },
+  "F:/音乐文件\\lx.music\\part1\\20才の約束 - 鈴木みのり.flac->F:/音乐文件\\MusicDownloader\\ogg_music\\bermei.inazawa - 共存.ogg": {
+    "from_song": "F:/音乐文件\\lx.music\\part1\\20才の約束 - 鈴木みのり.flac",
+    "to_song": "F:/音乐文件\\MusicDownloader\\ogg_music\\bermei.inazawa - 共存.ogg",
+    "good_count": 0,
+    "neutral_count": 0,
+    "bad_count": 1,
+    "last_update": 1766385219.2180753
+  },
+  "F:/音乐文件\\MusicDownloader\\ogg_music\\bermei.inazawa - 共存.ogg->F:/音乐文件\\lx.music\\part1\\Us ~時を越えて~ - project lights.mp3": {
+    "from_song": "F:/音乐文件\\MusicDownloader\\ogg_music\\bermei.inazawa - 共存.ogg",
+    "to_song": "F:/音乐文件\\lx.music\\part1\\Us ~時を越えて~ - project lights.mp3",
+    "good_count": 0,
+    "neutral_count": 0,
+    "bad_count": 1,
+    "last_update": 1766385220.058984
+  },
+  "F:/音乐文件\\lx.music\\part1\\Us ~時を越えて~ - project lights.mp3->F:/音乐文件\\lx.music\\part1\\cutie conductor - project lights.flac": {
+    "from_song": "F:/音乐文件\\lx.music\\part1\\Us ~時を越えて~ - project lights.mp3",
+    "to_song": "F:/音乐文件\\lx.music\\part1\\cutie conductor - project lights.flac",
+    "good_count": 0,
+    "neutral_count": 0,
+    "bad_count": 1,
+    "last_update": 1766385220.6581142
+  },
+  "F:/音乐文件\\MusicDownloader\\ogg_music\\Beverly - Again.ogg->F:/音乐文件\\lx.music\\part2\\ウィークエンドロール.mp3": {
+    "from_song": "F:/音乐文件\\MusicDownloader\\ogg_music\\Beverly - Again.ogg",
+    "to_song": "F:/音乐文件\\lx.music\\part2\\ウィークエンドロール.mp3",
+    "good_count": 1,
+    "neutral_count": 0,
+    "bad_count": 0,
+    "last_update": 1766386694.0764577
+  },
+  "F:/音乐文件\\lx.music\\part2\\ウィークエンドロール.mp3->F:/音乐文件\\MusicDownloader\\ogg_music\\ClariS - ヒトリゴト.ogg": {
+    "from_song": "F:/音乐文件\\lx.music\\part2\\ウィークエンドロール.mp3",
+    "to_song": "F:/音乐文件\\MusicDownloader\\ogg_music\\ClariS - ヒトリゴト.ogg",
+    "good_count": 1,
+    "neutral_count": 0,
+    "bad_count": 0,
+    "last_update": 1766386701.4331994
+  },
+  "F:/音乐文件\\MusicDownloader\\ogg_music\\ClariS - ヒトリゴト.ogg->F:/音乐文件\\MusicDownloader\\ogg_music\\Carcass - Black Star.ogg": {
+    "from_song": "F:/音乐文件\\MusicDownloader\\ogg_music\\ClariS - ヒトリゴト.ogg",
+    "to_song": "F:/音乐文件\\MusicDownloader\\ogg_music\\Carcass - Black Star.ogg",
+    "good_count": 0,
+    "neutral_count": 0,
+    "bad_count": 1,
+    "last_update": 1766386706.2464793
+  },
+  "F:/音乐文件\\MusicDownloader\\ogg_music\\Carcass - Black Star.ogg->F:/音乐文件\\MusicDownloader\\ogg_music\\Emilia - Big Big World.ogg": {
+    "from_song": "F:/音乐文件\\MusicDownloader\\ogg_music\\Carcass - Black Star.ogg",
+    "to_song": "F:/音乐文件\\MusicDownloader\\ogg_music\\Emilia - Big Big World.ogg",
+    "good_count": 0,
+    "neutral_count": 0,
+    "bad_count": 1,
+    "last_update": 1766386713.7615206
+  },
+  "F:/音乐文件\\MusicDownloader\\ogg_music\\Emilia - Big Big World.ogg->F:/音乐文件\\lx.music\\part5_25.8.13\\Rain Song.mp3": {
+    "from_song": "F:/音乐文件\\MusicDownloader\\ogg_music\\Emilia - Big Big World.ogg",
+    "to_song": "F:/音乐文件\\lx.music\\part5_25.8.13\\Rain Song.mp3",
+    "good_count": 0,
+    "neutral_count": 1,
+    "bad_count": 0,
+    "last_update": 1766386735.211134
+  },
+  "F:/音乐文件\\lx.music\\part5_25.8.13\\ちいさなラズベリー.mp3->F:/音乐文件\\MusicDownloader\\ogg_music\\bermei.inazawa - 共存.ogg": {
+    "from_song": "F:/音乐文件\\lx.music\\part5_25.8.13\\ちいさなラズベリー.mp3",
+    "to_song": "F:/音乐文件\\MusicDownloader\\ogg_music\\bermei.inazawa - 共存.ogg",
+    "good_count": 1,
+    "neutral_count": 0,
+    "bad_count": 0,
+    "last_update": 1766386820.0427203
+  },
+  "F:/音乐文件\\lx.music\\part1\\20才の約束 - 鈴木みのり.flac->F:/音乐文件\\lx.music\\part1\\Cherish you - 矢作紗友里.flac": {
+    "from_song": "F:/音乐文件\\lx.music\\part1\\20才の約束 - 鈴木みのり.flac",
+    "to_song": "F:/音乐文件\\lx.music\\part1\\Cherish you - 矢作紗友里.flac",
+    "good_count": 0,
+    "neutral_count": 0,
+    "bad_count": 1,
+    "last_update": 1766388568.4740791
+  },
+  "F:/音乐文件\\lx.music\\part1\\Cherish you - 矢作紗友里.flac->F:/音乐文件\\lx.music\\part1\\Us ~時を越えて~ - project lights.mp3": {
+    "from_song": "F:/音乐文件\\lx.music\\part1\\Cherish you - 矢作紗友里.flac",
+    "to_song": "F:/音乐文件\\lx.music\\part1\\Us ~時を越えて~ - project lights.mp3",
+    "good_count": 0,
+    "neutral_count": 0,
+    "bad_count": 1,
+    "last_update": 1766388569.0461795
+  },
+  "F:/音乐文件\\lx.music\\part1\\Us ~時を越えて~ - project lights.mp3->F:/音乐文件\\lx.music\\part2\\ウィークエンドロール.mp3": {
+    "from_song": "F:/音乐文件\\lx.music\\part1\\Us ~時を越えて~ - project lights.mp3",
+    "to_song": "F:/音乐文件\\lx.music\\part2\\ウィークエンドロール.mp3",
+    "good_count": 1,
+    "neutral_count": 0,
+    "bad_count": 0,
+    "last_update": 1766388569.746249
+  },
+  "F:/音乐文件\\lx.music\\part2\\ウィークエンドロール.mp3->F:/音乐文件\\lx.music\\part5_25.8.13\\Rain Song.mp3": {
+    "from_song": "F:/音乐文件\\lx.music\\part2\\ウィークエンドロール.mp3",
+    "to_song": "F:/音乐文件\\lx.music\\part5_25.8.13\\Rain Song.mp3",
+    "good_count": 0,
+    "neutral_count": 0,
+    "bad_count": 1,
+    "last_update": 1766388573.6060815
+  },
+  "F:/音乐文件\\lx.music\\part5_25.8.13\\Rain Song.mp3->F:/音乐文件\\lx.music\\part5_25.8.13\\ちいさなラズベリー.mp3": {
+    "from_song": "F:/音乐文件\\lx.music\\part5_25.8.13\\Rain Song.mp3",
+    "to_song": "F:/音乐文件\\lx.music\\part5_25.8.13\\ちいさなラズベリー.mp3",
+    "good_count": 0,
+    "neutral_count": 0,
+    "bad_count": 1,
+    "last_update": 1766388593.409746
+  },
+  "F:/音乐文件\\lx.music\\part5_25.8.13\\ちいさなラズベリー.mp3->F:/音乐文件\\MusicDownloader\\ogg_music\\Beverly - Again.ogg": {
+    "from_song": "F:/音乐文件\\lx.music\\part5_25.8.13\\ちいさなラズベリー.mp3",
+    "to_song": "F:/音乐文件\\MusicDownloader\\ogg_music\\Beverly - Again.ogg",
+    "good_count": 1,
+    "neutral_count": 0,
+    "bad_count": 0,
+    "last_update": 1766388595.0869102
+  },
+  "F:/音乐文件\\MusicDownloader\\ogg_music\\Beverly - Again.ogg->F:/音乐文件\\MusicDownloader\\ogg_music\\Carcass - Black Star.ogg": {
+    "from_song": "F:/音乐文件\\MusicDownloader\\ogg_music\\Beverly - Again.ogg",
+    "to_song": "F:/音乐文件\\MusicDownloader\\ogg_music\\Carcass - Black Star.ogg",
+    "good_count": 0,
+    "neutral_count": 0,
+    "bad_count": 1,
+    "last_update": 1766388595.773346
+  },
+  "F:/音乐文件\\MusicDownloader\\ogg_music\\Carcass - Black Star.ogg->F:/音乐文件\\MusicDownloader\\ogg_music\\ClariS - ヒトリゴト.ogg": {
+    "from_song": "F:/音乐文件\\MusicDownloader\\ogg_music\\Carcass - Black Star.ogg",
+    "to_song": "F:/音乐文件\\MusicDownloader\\ogg_music\\ClariS - ヒトリゴト.ogg",
+    "good_count": 1,
+    "neutral_count": 0,
+    "bad_count": 0,
+    "last_update": 1766388596.5337741
+  },
+  "F:/音乐文件\\MusicDownloader\\ogg_music\\ClariS - ヒトリゴト.ogg->F:/音乐文件\\MusicDownloader\\ogg_music\\Emilia - Big Big World.ogg": {
+    "from_song": "F:/音乐文件\\MusicDownloader\\ogg_music\\ClariS - ヒトリゴト.ogg",
+    "to_song": "F:/音乐文件\\MusicDownloader\\ogg_music\\Emilia - Big Big World.ogg",
+    "good_count": 0,
+    "neutral_count": 0,
+    "bad_count": 1,
+    "last_update": 1766388597.2975335
+  },
+  "F:/音乐文件\\MusicDownloader\\ogg_music\\Emilia - Big Big World.ogg->F:/音乐文件\\lx.music\\part1\\ABC - 少年隊.mp3": {
+    "from_song": "F:/音乐文件\\MusicDownloader\\ogg_music\\Emilia - Big Big World.ogg",
+    "to_song": "F:/音乐文件\\lx.music\\part1\\ABC - 少年隊.mp3",
+    "good_count": 0,
+    "neutral_count": 0,
+    "bad_count": 1,
+    "last_update": 1766388597.981599
+  },
+  "F:/音乐文件\\lx.music\\part1\\ABC - 少年隊.mp3->F:/音乐文件\\lx.music\\part1\\Blooming Lily - 大西沙織.flac": {
+    "from_song": "F:/音乐文件\\lx.music\\part1\\ABC - 少年隊.mp3",
+    "to_song": "F:/音乐文件\\lx.music\\part1\\Blooming Lily - 大西沙織.flac",
+    "good_count": 1,
+    "neutral_count": 0,
+    "bad_count": 0,
+    "last_update": 1766388598.565687
+  },
+  "F:/音乐文件\\lx.music\\part1\\Blooming Lily - 大西沙織.flac->F:/音乐文件\\lx.music\\part1\\Catherine - 陶喆.flac": {
+    "from_song": "F:/音乐文件\\lx.music\\part1\\Blooming Lily - 大西沙織.flac",
+    "to_song": "F:/音乐文件\\lx.music\\part1\\Catherine - 陶喆.flac",
+    "good_count": 0,
+    "neutral_count": 0,
+    "bad_count": 1,
+    "last_update": 1766388599.0457857
+  },
+  "F:/音乐文件\\lx.music\\part1\\Catherine - 陶喆.flac->F:/音乐文件\\lx.music\\part1\\Chelsea Rodgers - Prince.flac": {
+    "from_song": "F:/音乐文件\\lx.music\\part1\\Catherine - 陶喆.flac",
+    "to_song": "F:/音乐文件\\lx.music\\part1\\Chelsea Rodgers - Prince.flac",
+    "good_count": 0,
+    "neutral_count": 0,
+    "bad_count": 1,
+    "last_update": 1766388601.3622174
+  },
+  "F:/音乐文件\\lx.music\\part1\\Chelsea Rodgers - Prince.flac->F:/音乐文件\\lx.music\\part1\\Crosswalk - 鈴木みのり.flac": {
+    "from_song": "F:/音乐文件\\lx.music\\part1\\Chelsea Rodgers - Prince.flac",
+    "to_song": "F:/音乐文件\\lx.music\\part1\\Crosswalk - 鈴木みのり.flac",
+    "good_count": 1,
+    "neutral_count": 0,
+    "bad_count": 0,
+    "last_update": 1766388601.7819104
+  },
+  "F:/音乐文件\\lx.music\\part1\\Crosswalk - 鈴木みのり.flac->F:/音乐文件\\lx.music\\part1\\Dear God - 陶喆.flac": {
+    "from_song": "F:/音乐文件\\lx.music\\part1\\Crosswalk - 鈴木みのり.flac",
+    "to_song": "F:/音乐文件\\lx.music\\part1\\Dear God - 陶喆.flac",
+    "good_count": 0,
+    "neutral_count": 0,
+    "bad_count": 1,
+    "last_update": 1766388602.653807
+  },
+  "F:/音乐文件\\lx.music\\part1\\Dear God - 陶喆.flac->F:/音乐文件\\lx.music\\part1\\Dreamer - AiRI.flac": {
+    "from_song": "F:/音乐文件\\lx.music\\part1\\Dear God - 陶喆.flac",
+    "to_song": "F:/音乐文件\\lx.music\\part1\\Dreamer - AiRI.flac",
+    "good_count": 0,
+    "neutral_count": 0,
+    "bad_count": 1,
+    "last_update": 1766388603.73386
+  },
+  "F:/音乐文件\\lx.music\\part1\\Dreamer - AiRI.flac->F:/音乐文件\\lx.music\\part1\\Duvet - Bôa.flac": {
+    "from_song": "F:/音乐文件\\lx.music\\part1\\Dreamer - AiRI.flac",
+    "to_song": "F:/音乐文件\\lx.music\\part1\\Duvet - Bôa.flac",
+    "good_count": 0,
+    "neutral_count": 0,
+    "bad_count": 1,
+    "last_update": 1766388604.4787793
+  },
+  "F:/音乐文件\\lx.music\\part1\\Duvet - Bôa.flac->F:/音乐文件\\lx.music\\part1\\fluffy - 戸松遥.mp3": {
+    "from_song": "F:/音乐文件\\lx.music\\part1\\Duvet - Bôa.flac",
+    "to_song": "F:/音乐文件\\lx.music\\part1\\fluffy - 戸松遥.mp3",
+    "good_count": 0,
+    "neutral_count": 0,
+    "bad_count": 1,
+    "last_update": 1766388605.0855134
+  },
+  "F:/音乐文件\\lx.music\\part1\\fluffy - 戸松遥.mp3->F:/音乐文件\\lx.music\\part1\\fluffy(Off　Vocal) - 戸松遥.mp3": {
+    "from_song": "F:/音乐文件\\lx.music\\part1\\fluffy - 戸松遥.mp3",
+    "to_song": "F:/音乐文件\\lx.music\\part1\\fluffy(Off　Vocal) - 戸松遥.mp3",
+    "good_count": 0,
+    "neutral_count": 0,
+    "bad_count": 1,
+    "last_update": 1766388605.4181306
+  },
+  "F:/音乐文件\\lx.music\\part1\\fluffy(Off　Vocal) - 戸松遥.mp3->F:/音乐文件\\lx.music\\part1\\Get On the Boat - Prince.flac": {
+    "from_song": "F:/音乐文件\\lx.music\\part1\\fluffy(Off　Vocal) - 戸松遥.mp3",
+    "to_song": "F:/音乐文件\\lx.music\\part1\\Get On the Boat - Prince.flac",
+    "good_count": 0,
+    "neutral_count": 0,
+    "bad_count": 1,
+    "last_update": 1766388606.6458888
+  },
+  "F:/音乐文件\\lx.music\\part1\\Get On the Boat - Prince.flac->F:/音乐文件\\lx.music\\part1\\GIRAFFE BLUES ~Freyja Solo~ - 鈴木みのり.flac": {
+    "from_song": "F:/音乐文件\\lx.music\\part1\\Get On the Boat - Prince.flac",
+    "to_song": "F:/音乐文件\\lx.music\\part1\\GIRAFFE BLUES ~Freyja Solo~ - 鈴木みのり.flac",
+    "good_count": 0,
+    "neutral_count": 0,
+    "bad_count": 1,
+    "last_update": 1766388606.9104524
+  },
+  "F:/音乐文件\\lx.music\\part1\\GIRAFFE BLUES ~Freyja Solo~ - 鈴木みのり.flac->F:/音乐文件\\lx.music\\part1\\God Bless You - 鈴木みのり.flac": {
+    "from_song": "F:/音乐文件\\lx.music\\part1\\GIRAFFE BLUES ~Freyja Solo~ - 鈴木みのり.flac",
+    "to_song": "F:/音乐文件\\lx.music\\part1\\God Bless You - 鈴木みのり.flac",
+    "good_count": 0,
+    "neutral_count": 0,
+    "bad_count": 1,
+    "last_update": 1766388607.4225743
+  },
+  "F:/音乐文件\\lx.music\\part1\\God Bless You - 鈴木みのり.flac->F:/音乐文件\\lx.music\\part1\\Heart To Heart - 赤﨑千夏.flac": {
+    "from_song": "F:/音乐文件\\lx.music\\part1\\God Bless You - 鈴木みのり.flac",
+    "to_song": "F:/音乐文件\\lx.music\\part1\\Heart To Heart - 赤﨑千夏.flac",
+    "good_count": 1,
+    "neutral_count": 0,
+    "bad_count": 0,
+    "last_update": 1766388607.9899294
+  },
+  "F:/音乐文件\\lx.music\\part1\\Heart To Heart - 赤﨑千夏.flac->F:/音乐文件\\lx.music\\part1\\heartfelt - 戸松遥.mp3": {
+    "from_song": "F:/音乐文件\\lx.music\\part1\\Heart To Heart - 赤﨑千夏.flac",
+    "to_song": "F:/音乐文件\\lx.music\\part1\\heartfelt - 戸松遥.mp3",
+    "good_count": 0,
+    "neutral_count": 0,
+    "bad_count": 1,
+    "last_update": 1766388608.5031478
+  }
+}

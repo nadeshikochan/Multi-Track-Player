@@ -11,10 +11,20 @@ from typing import Optional, List
 from PyQt6.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
     QSlider, QSplitter, QLineEdit, QMessageBox, QDialog, QProgressBar,
-    QMenu, QStackedWidget, QAbstractItemView, QTableView, QFrame, QToolButton
+    QMenu, QStackedWidget, QAbstractItemView, QTableView, QFrame, QToolButton,
+    QSystemTrayIcon
 )
 from PyQt6.QtCore import Qt, QTimer, QSettings, QModelIndex, QPoint, QUrl
-from PyQt6.QtGui import QFont, QKeySequence, QShortcut, QMouseEvent
+from PyQt6.QtGui import QFont, QKeySequence, QShortcut, QMouseEvent, QIcon
+
+# 全局快捷键支持 - 尝试导入pynput
+try:
+    from pynput import keyboard as pynput_keyboard
+    GLOBAL_HOTKEY_AVAILABLE = True
+except ImportError:
+    GLOBAL_HOTKEY_AVAILABLE = False
+    print("[警告] pynput未安装，全局快捷键不可用。安装: pip install pynput")
+
 from PyQt6.QtMultimedia import QMediaPlayer
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -25,9 +35,17 @@ from core.recommendation_api import RecommendationAPIServer, DefaultRecommendati
 from core.lxmusic_api import OnlineMusicClient, OnlineSong
 from core.custom_source import CustomSourceManager, SourceAPIProxy
 
+# 预加载系统
+try:
+    from core.audio_preloader import get_audio_preloader, get_audio_cache, SmartPreloader
+    PRELOADER_AVAILABLE = True
+except ImportError:
+    PRELOADER_AVAILABLE = False
+    print("[警告] 预加载模块未找到，使用基础模式")
+
 from ui.track_control import TrackControl, TrackControlPanel
 from ui.lyrics_page import LyricsPage
-from ui.dialogs import SettingsDialog, MSSTDialog, OnlineSearchDialog, CustomSourceDialog
+from ui.dialogs import SettingsDialog, MSSTDialog, OnlineSearchDialog, CustomSourceDialog, RecommenderDebugDialog
 
 
 class ClickableSlider(QSlider):
@@ -166,12 +184,52 @@ class MultiTrackPlayer(QMainWindow):
         # 进度条拖动状态
         self.seek_pending = False
         self.seek_value = 0
+        self.slider_being_dragged = False  # 修复：添加slider拖动状态初始化
+        
+        # 主音量 - 从配置加载
+        self.master_volume = self.settings.value("master_volume", 80, type=int)
+        
+        # 个人推荐系统初始化
+        self._personal_recommender = None
+        self._skip_end_recording = False  # 标记是否跳过on_song_end记录
+        self._init_personal_recommender()
+        
+        # 预加载系统初始化
+        if PRELOADER_AVAILABLE:
+            self._preloader = get_audio_preloader()
+            self._smart_preloader = SmartPreloader(self._preloader)
+            self._preloader.preload_finished.connect(self._on_preload_finished)
+        else:
+            self._preloader = None
+            self._smart_preloader = None
+        
         self.setup_ui()
         self.setup_shortcuts()
         self.setup_timer()
         self.setup_recommendation_api()
+        # 恢复播放设置
+        self._restore_playback_settings()
         # 改用缓存加载或扫描
         QTimer.singleShot(100, self.load_songs_with_cache)
+    
+    def _init_personal_recommender(self):
+        """初始化个人推荐系统"""
+        try:
+            recommender_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'personal_music_recommender')
+            if recommender_path not in sys.path:
+                sys.path.insert(0, recommender_path)
+            
+            from personal_recommender import PersonalMusicRecommender
+            data_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'user_data', 'recommender')
+            os.makedirs(data_dir, exist_ok=True)
+            self._personal_recommender = PersonalMusicRecommender(data_dir)
+            print("[播放器] 个人推荐系统已初始化")
+        except ImportError as e:
+            print(f"[播放器] 个人推荐系统模块未找到: {e}")
+            self._personal_recommender = None
+        except Exception as e:
+            print(f"[播放器] 个人推荐系统初始化失败: {e}")
+            self._personal_recommender = None
         
     def _load_config(self) -> dict:
         return {
@@ -184,8 +242,36 @@ class MultiTrackPlayer(QMainWindow):
             'output_format': self.settings.value("output_format", "wav"),
             'recommendation_port': int(self.settings.value("recommendation_port", 23331)),
             'recommendation_enabled': self.settings.value("recommendation_enabled", True, type=bool),
-            'lxmusic_api_url': self.settings.value("lxmusic_api_url", "http://127.0.0.1:9763")
+            'lxmusic_api_url': self.settings.value("lxmusic_api_url", "http://127.0.0.1:9763"),
+            # MSST Python路径
+            'msst_python_path': self.settings.value("msst_python_path", ""),
+            # 压缩设置
+            'compress_stems': self.settings.value("compress_stems", True, type=bool),
+            'compress_bitrate': self.settings.value("compress_bitrate", "64k"),
+            'compress_format': self.settings.value("compress_format", "m4a"),
+            # 推荐系统设置
+            'recommendation_pool_size': int(self.settings.value("recommendation_pool_size", 20)),
         }
+        
+    def _restore_playback_settings(self):
+        """恢复播放设置（在UI创建后调用）"""
+        # 恢复播放模式
+        saved_mode = self.settings.value("play_mode", "sequential")
+        if saved_mode in ["sequential", "shuffle", "repeat_one"]:
+            self.play_mode = saved_mode
+            modes = ["sequential", "shuffle", "repeat_one"]
+            icons = ["🔁", "🔀", "🔂"]
+            tips = ["顺序播放", "随机播放", "单曲循环"]
+            idx = modes.index(self.play_mode)
+            self.mode_btn.setText(icons[idx])
+            self.mode_btn.setToolTip(tips[idx])
+        
+        # 恢复播放速度
+        saved_rate = self.settings.value("playback_rate", 1.0, type=float)
+        if 0.25 <= saved_rate <= 2.0:
+            self.playback_rate = saved_rate
+            self.speed_slider.setValue(int(saved_rate * 100))
+            self.speed_label.setText(f"{saved_rate:.2f}x")
         
     def _save_config(self):
         for key, value in self.config.items():
@@ -196,6 +282,8 @@ class MultiTrackPlayer(QMainWindow):
             self.recommendation_server.set_provider(self.recommendation_provider)
             self.recommendation_server.set_player_callback(self._handle_api_callback)
             self.recommendation_server.start()
+        else:
+            print("[播放器] 内置推荐API已禁用")
             
     def _handle_api_callback(self, action: str, data=None):
         if action == 'get_status':
@@ -246,6 +334,7 @@ class MultiTrackPlayer(QMainWindow):
         self.track_panel.separate_btn.clicked.connect(self.separate_current_song)
         self.page_stack.addWidget(self.track_panel)
         self.lyrics_page = LyricsPage()
+        self.lyrics_page.volume_changed.connect(self._on_lyrics_volume_changed)
         self.page_stack.addWidget(self.lyrics_page)
         content_splitter.addWidget(self.page_stack)
         
@@ -255,6 +344,9 @@ class MultiTrackPlayer(QMainWindow):
         
         player_bar = self._create_player_bar()
         main_layout.addWidget(player_bar)
+        
+        # 恢复播放设置
+        QTimer.singleShot(200, self._restore_playback_settings)
         
     def _create_top_bar(self) -> QWidget:
         widget = QWidget()
@@ -307,6 +399,12 @@ class MultiTrackPlayer(QMainWindow):
         msst_btn.setStyleSheet("QPushButton { background: #e85d04; color: white; border: none; border-radius: 8px; padding: 10px 20px; } QPushButton:hover { background: #f77f00; }")
         msst_btn.clicked.connect(self.open_msst_settings)
         layout.addWidget(msst_btn)
+        
+        # 推荐调试按钮
+        recommender_btn = QPushButton("🧠 推荐调试")
+        recommender_btn.setStyleSheet("QPushButton { background: #0891b2; color: white; border: none; border-radius: 8px; padding: 10px 20px; } QPushButton:hover { background: #06b6d4; }")
+        recommender_btn.clicked.connect(self.open_recommender_debug)
+        layout.addWidget(recommender_btn)
         
         settings_btn = QPushButton("⚙️ 设置")
         settings_btn.setStyleSheet("QPushButton { background: #2a2a3a; color: #e0e0e0; border: none; border-radius: 8px; padding: 10px 20px; } QPushButton:hover { background: #3a3a4a; }")
@@ -428,6 +526,7 @@ class MultiTrackPlayer(QMainWindow):
             self.page_lyrics_btn.setChecked(True)
             
     def setup_shortcuts(self):
+        # 窗口内快捷键（保留原有功能）
         QShortcut(QKeySequence(Qt.Key.Key_Space), self, self.toggle_play)
         QShortcut(QKeySequence(Qt.Key.Key_Left), self, self.seek_backward)
         QShortcut(QKeySequence(Qt.Key.Key_Right), self, self.seek_forward)
@@ -437,6 +536,129 @@ class MultiTrackPlayer(QMainWindow):
         QShortcut(QKeySequence(Qt.Key.Key_Escape), self, self.clear_search)
         QShortcut(QKeySequence("Ctrl+L"), self, lambda: self.switch_page("lyrics"))
         QShortcut(QKeySequence("Ctrl+T"), self, lambda: self.switch_page("tracks"))
+        
+        # 全局快捷键
+        self._setup_global_hotkeys()
+    
+    def _setup_global_hotkeys(self):
+        """设置全局快捷键（窗口外也可用）
+        
+        快捷键列表:
+        - Ctrl + →  : 下一曲
+        - Ctrl + ←  : 上一曲  
+        - Ctrl + ↑  : 提高音量
+        - Ctrl + ↓  : 降低音量
+        - Ctrl + Alt + 0 : 收藏当前歌曲
+        - Ctrl + Alt + ↓ : 显示歌词页面
+        - Alt + 空格 : 播放/暂停
+        """
+        if not GLOBAL_HOTKEY_AVAILABLE:
+            print("[快捷键] 全局快捷键不可用，请安装pynput: pip install pynput")
+            return
+        
+        self._hotkey_listener = None
+        self._pressed_keys = set()
+        
+        def on_press(key):
+            try:
+                self._pressed_keys.add(key)
+                
+                # 检测组合键
+                ctrl = pynput_keyboard.Key.ctrl_l in self._pressed_keys or pynput_keyboard.Key.ctrl_r in self._pressed_keys
+                alt = pynput_keyboard.Key.alt_l in self._pressed_keys or pynput_keyboard.Key.alt_r in self._pressed_keys
+                
+                # Alt + 空格: 播放/暂停
+                if alt and pynput_keyboard.Key.space in self._pressed_keys:
+                    QTimer.singleShot(0, self.toggle_play)
+                    return
+                
+                # Ctrl + 方向键
+                if ctrl and not alt:
+                    if pynput_keyboard.Key.right in self._pressed_keys:
+                        QTimer.singleShot(0, self.play_next)
+                    elif pynput_keyboard.Key.left in self._pressed_keys:
+                        QTimer.singleShot(0, self.play_previous)
+                    elif pynput_keyboard.Key.up in self._pressed_keys:
+                        QTimer.singleShot(0, self._increase_volume)
+                    elif pynput_keyboard.Key.down in self._pressed_keys:
+                        QTimer.singleShot(0, self._decrease_volume)
+                
+                # Ctrl + Alt 组合
+                if ctrl and alt:
+                    # Ctrl + Alt + 0: 收藏
+                    if hasattr(key, 'char') and key.char == '0':
+                        QTimer.singleShot(0, self._toggle_favorite)
+                    # Ctrl + Alt + ↓: 显示歌词
+                    elif pynput_keyboard.Key.down in self._pressed_keys:
+                        QTimer.singleShot(0, lambda: self.switch_page("lyrics"))
+                        
+            except Exception as e:
+                print(f"[快捷键] 处理按键错误: {e}")
+        
+        def on_release(key):
+            try:
+                self._pressed_keys.discard(key)
+            except:
+                pass
+        
+        try:
+            self._hotkey_listener = pynput_keyboard.Listener(on_press=on_press, on_release=on_release)
+            self._hotkey_listener.start()
+            print("[快捷键] 全局快捷键已启用")
+            print("  Ctrl+→: 下一曲 | Ctrl+←: 上一曲")
+            print("  Ctrl+↑: 音量+ | Ctrl+↓: 音量-")
+            print("  Ctrl+Alt+0: 收藏 | Ctrl+Alt+↓: 歌词")
+            print("  Alt+空格: 播放/暂停")
+        except Exception as e:
+            print(f"[快捷键] 启动全局快捷键失败: {e}")
+    
+    def _increase_volume(self):
+        """提高音量"""
+        new_volume = min(100, self.master_volume + 5)
+        self._set_master_volume(new_volume)
+        print(f"[音量] 提高到 {new_volume}%")
+    
+    def _decrease_volume(self):
+        """降低音量"""
+        new_volume = max(0, self.master_volume - 5)
+        self._set_master_volume(new_volume)
+        print(f"[音量] 降低到 {new_volume}%")
+    
+    def _set_master_volume(self, volume: int):
+        """设置主音量"""
+        self.master_volume = volume
+        # 更新所有音轨的音量
+        for tc in self.track_controls:
+            tc.set_volume(volume)
+        # 更新歌词页面的音量滑块（如果有）
+        if hasattr(self.lyrics_page, 'volume_slider'):
+            self.lyrics_page.set_volume(volume)
+        # 保存设置
+        self.settings.setValue("master_volume", volume)
+    
+    def _on_lyrics_volume_changed(self, volume: int):
+        """歌词页面音量改变时的处理"""
+        self.master_volume = volume
+        # 更新所有音轨的音量
+        for tc in self.track_controls:
+            tc.set_volume(volume)
+        # 保存设置
+        self.settings.setValue("master_volume", volume)
+    
+    def _toggle_favorite(self):
+        """切换当前歌曲的收藏状态"""
+        if not self.current_song:
+            print("[收藏] 没有正在播放的歌曲")
+            return
+        # TODO: 实现收藏功能
+        print(f"[收藏] 切换收藏: {self.current_song.title}")
+        # 可以通过推荐系统增加偏好分数
+        if self._personal_recommender:
+            try:
+                self._personal_recommender.on_positive_feedback()
+                print("[收藏] 已标记为喜欢")
+            except Exception as e:
+                print(f"[收藏] 标记失败: {e}")
         
     def setup_timer(self):
         self.update_timer = QTimer()
@@ -460,7 +682,10 @@ class MultiTrackPlayer(QMainWindow):
         music_path = self.config.get('music_path', '')
         stems_path = self.config.get('stems_path', '')
         
+        print(f"[播放器] 加载歌曲，音乐路径: {music_path}")
+        
         if not music_path:
+            print("[播放器] 未设置音乐路径，请在设置中配置")
             return
             
         # 尝试从缓存加载
@@ -468,21 +693,34 @@ class MultiTrackPlayer(QMainWindow):
         
         if cached_songs:
             # 使用缓存的歌曲列表
+            print(f"[播放器] 从缓存加载 {len(cached_songs)} 首歌曲")
             self.songs = cached_songs
             self.song_list.song_model.set_songs(self.songs)
             self.song_list.update_count(len(self.songs))
             self.shuffle_order = list(range(len(self.songs)))
             random.shuffle(self.shuffle_order)
             self.shuffle_index = 0
-            self.recommendation_provider.set_song_pool([
-                {'path': s.path, 'title': s.title, 'artist': s.artist} 
+            
+            # 构建歌曲信息列表
+            song_info_list = [
+                {'path': s.path, 'title': s.title, 'artist': s.artist, 'album': s.album, 'duration': s.duration} 
                 for s in self.songs
-            ])
+            ]
+            
+            # 注册到默认推荐提供者
+            self.recommendation_provider.set_song_pool(song_info_list)
+            
+            # 【关键修复】注册到个人推荐系统
+            if self._personal_recommender:
+                self._personal_recommender.register_song_pool(song_info_list)
+                print(f"[播放器] 已将 {len(self.songs)} 首歌曲注册到个人推荐系统")
+            
             # 后台更新stems状态
             self.song_cache.update_stems_status(self.songs, stems_path)
             self.song_list.song_model.set_songs(self.songs)
         else:
             # 缓存无效，重新扫描
+            print("[播放器] 缓存无效，开始扫描歌曲...")
             self.start_scan()
         
     def start_scan(self):
@@ -516,7 +754,22 @@ class MultiTrackPlayer(QMainWindow):
         random.shuffle(self.shuffle_order)
         self.shuffle_index = 0
         self.song_list.update_count(len(self.songs))
-        self.recommendation_provider.set_song_pool([{'path': s.path, 'title': s.title, 'artist': s.artist} for s in self.songs])
+        print(f"[播放器] 扫描完成，共找到 {len(self.songs)} 首歌曲")
+        
+        # 构建歌曲信息列表
+        song_info_list = [
+            {'path': s.path, 'title': s.title, 'artist': s.artist, 'album': s.album, 'duration': s.duration} 
+            for s in self.songs
+        ]
+        
+        # 注册到默认推荐提供者
+        self.recommendation_provider.set_song_pool(song_info_list)
+        
+        # 【关键修复】注册到个人推荐系统
+        if self._personal_recommender:
+            self._personal_recommender.register_song_pool(song_info_list)
+            print(f"[播放器] 已将 {len(self.songs)} 首歌曲注册到个人推荐系统")
+        
         # 保存缓存
         self.song_cache.save_cache(
             self.songs, 
@@ -557,23 +810,95 @@ class MultiTrackPlayer(QMainWindow):
             subprocess.run(['xdg-open', os.path.dirname(path)])
             
     def on_song_double_clicked(self, index: QModelIndex):
+        print(f"[播放器] 双击歌曲，行号: {index.row()}")
         self.play_song_at_index(index.row())
         
     def play_song_at_index(self, index: int):
         song = self.song_list.song_model.get_song(index)
         if song:
+            print(f"[播放器] 播放索引 {index} 的歌曲: {song.title}")
             self.play_song(song)
+        else:
+            print(f"[播放器] 无法获取索引 {index} 的歌曲")
             
     def play_song(self, song: SongInfo):
+        print(f"\n[播放器] ======== 开始播放 ========")
+        print(f"[播放器] 歌曲: {song.title} - {song.artist}")
+        print(f"[播放器] 路径: {song.path}")
+        print(f"[播放器] 在线: {song.is_online}")
+        
+        # 检查学习是否启用
+        learning_enabled = self.settings.value("recommender_learning_enabled", True, type=bool)
+        
+        # 检查是否需要跳过记录（如果是自然结束后的下一首，已经在 on_song_ended 中记录过了）
+        skip_recording = getattr(self, '_skip_end_recording', False)
+        
+        # 【关键修复】先获取播放位置信息，再停止音轨
+        # 否则停止后 get_position() 和 get_duration() 可能返回0
+        cached_position = 0
+        cached_duration = 0
+        if self.track_controls:
+            try:
+                cached_position = self.track_controls[0].get_position()
+                cached_duration = self.track_controls[0].get_duration()
+                print(f"[播放器] 缓存当前播放状态: {cached_position/1000:.1f}s / {cached_duration/1000:.1f}s")
+            except Exception as e:
+                print(f"[播放器] 获取播放位置失败: {e}")
+        
+        # 记录上一首歌的播放信息（用于推荐系统）
+        # 关键：检测用户的播放行为（秒切/听一半/听完）来学习当前喜好
+        print(f"[播放器] 1. 记录上一首歌信息... (skip={skip_recording})")
+        if self.current_song and self._personal_recommender and learning_enabled and not skip_recording:
+            try:
+                position = cached_position
+                duration = cached_duration
+                
+                # 如果缓存的时长为0，尝试使用歌曲信息中的时长
+                if duration <= 0 and self.current_song.duration:
+                    duration = self.current_song.duration * 1000  # 转换为毫秒
+                
+                # 计算播放比例
+                play_ratio = position / duration if duration > 0 else 0
+                
+                # 根据播放比例判断行为类型
+                if play_ratio >= 0.8:
+                    action = 'complete'  # 听完了 - 说明喜欢这首歌
+                    behavior = "听完"
+                elif play_ratio >= 0.3:
+                    action = 'half'  # 听了一半 - 一般喜欢
+                    behavior = "听一半"
+                else:
+                    action = 'skip'  # 秒切 - 当前不想听这类型
+                    behavior = "秒切"
+                
+                print(f"[推荐系统] 行为检测: {behavior} (播放{play_ratio:.1%}, {position/1000:.1f}s/{duration/1000:.1f}s)")
+                
+                self._personal_recommender.on_song_end(
+                    {'path': self.current_song.path, 'title': self.current_song.title, 
+                     'artist': self.current_song.artist, 'duration': duration / 1000},
+                    position / 1000,
+                    action
+                )
+            except Exception as e:
+                print(f"[推荐系统] 记录结束事件失败: {e}")
+                import traceback
+                traceback.print_exc()
+        
+        print(f"[播放器] 2. 停止所有音轨...")
         self.stop_all_tracks()
+        print(f"[播放器] 3. 清理音轨...")
         self.cleanup_tracks()
+        print(f"[播放器] 4. 设置当前歌曲...")
         self.current_song = song
         self.current_song_index = self.songs.index(song) if song in self.songs else -1
         self.mode = "single"
         self.mode_label.setText("模式: 单曲")
+        print(f"[播放器] 5. 更新UI...")
         self.track_panel.set_current_song(song.title)
         self.lyrics_page.set_song(song.title, song.artist, song.album)
+        print(f"[播放器] 6. 设置封面...")
         self.lyrics_page.set_cover(song.cover_data)
+        print(f"[播放器] 7. 设置歌词...")
         self.lyrics_page.set_lyrics(song.lyrics)
         if song.has_stems:
             self.track_panel.separate_btn.setText("🎚️ 播放分离音轨")
@@ -581,22 +906,108 @@ class MultiTrackPlayer(QMainWindow):
             self.track_panel.separate_btn.setText("✂️ 一键分离音轨")
         self.track_panel.separate_btn.setEnabled(True)
         self.track_panel.separate_status.setText("")
-        tc = self.track_panel.add_track(song.path)
+        
+        # 添加音轨控件 - 单音轨模式使用QMediaPlayer（异步加载，不阻塞UI）
+        print(f"[播放器] 8. 添加音轨控件...")
+        tc = self.track_panel.add_track(song.path, force_qmedia=True)
+        print(f"[播放器] 9. 设置播放速率...")
         tc.set_playback_rate(self.playback_rate)
         self.track_controls.append(tc)
+        
+        # 设置播放器 - 确保在播放前完成设置
+        print(f"[播放器] 10. 初始化音轨控件...")
         tc.setup_player()
-        # pygame 模式下 tc.player 为 None，需要检查
+        print(f"[播放器] 11. setup_player完成")
+        
+        # 设置播放结束回调（支持pygame模式的自动下一首）
+        sync_manager = self.track_panel.get_sync_manager()
+        sync_manager.set_end_callback(self.on_song_ended)
+        
+        # QMediaPlayer 模式下连接媒体状态变化信号
         if tc.player is not None:
             tc.player.mediaStatusChanged.connect(self.on_media_status_changed)
+        
+        print(f"[播放器] 12. 开始播放音轨...")
         self.play_all_tracks()
         self.is_playing = True
         self.play_btn.setText("⏸")
         self.update_timer.start(100)
         
+        # 通知推荐系统新歌开始播放
+        if self._personal_recommender and learning_enabled:
+            try:
+                self._personal_recommender.on_song_start({
+                    'path': song.path, 
+                    'title': song.title, 
+                    'artist': song.artist,
+                    'duration': song.duration
+                })
+            except Exception as e:
+                print(f"[推荐系统] 记录开始事件失败: {e}")
+        
+        # 更新智能预加载器状态，预加载下一首歌曲
+        if self._smart_preloader:
+            self._smart_preloader.set_playlist(self.songs)
+            self._smart_preloader.set_current_index(self.current_song_index)
+            self._smart_preloader.set_play_mode(self.play_mode)
+            if self.play_mode == "shuffle":
+                self._smart_preloader.set_shuffle_state(self.shuffle_order, self.shuffle_index)
+        
+        print(f"[播放器] ======== 播放初始化完成 ========")
+        
     def play_stems(self, song: SongInfo):
+        """播放分离音轨 - 改进版：找不到音轨时自动重新分离"""
         if not song.has_stems or not song.stems_path:
             QMessageBox.warning(self, "提示", "该歌曲没有分离音轨")
             return
+        
+        # 检查分离音轨文件夹是否存在
+        if not os.path.exists(song.stems_path):
+            reply = QMessageBox.question(
+                self, "分离音轨不存在", 
+                f"分离音轨文件夹不存在:\n{song.stems_path}\n\n是否重新分离音轨?",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+            )
+            if reply == QMessageBox.StandardButton.Yes:
+                # 重置状态并重新分离
+                song.has_stems = False
+                song.stems_path = ""
+                self.song_list.song_model.update_song(song)
+                self.separate_song(song)
+            return
+        
+        # 获取音频文件列表
+        try:
+            audio_files = sorted([
+                os.path.join(song.stems_path, f) 
+                for f in os.listdir(song.stems_path) 
+                if f.lower().endswith(tuple(SUPPORTED_FORMATS))
+            ])
+        except OSError as e:
+            QMessageBox.warning(self, "读取错误", f"无法读取分离音轨文件夹:\n{e}")
+            return
+        
+        # 检查是否有音频文件
+        if not audio_files:
+            reply = QMessageBox.question(
+                self, "分离音轨为空", 
+                f"分离音轨文件夹中没有音频文件:\n{song.stems_path}\n\n是否重新分离音轨?",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+            )
+            if reply == QMessageBox.StandardButton.Yes:
+                # 清理空文件夹
+                import shutil
+                try:
+                    shutil.rmtree(song.stems_path)
+                except:
+                    pass
+                # 重置状态并重新分离
+                song.has_stems = False
+                song.stems_path = ""
+                self.song_list.song_model.update_song(song)
+                self.separate_song(song)
+            return
+        
         self.stop_all_tracks()
         self.cleanup_tracks()
         self.current_song = song
@@ -609,22 +1020,33 @@ class MultiTrackPlayer(QMainWindow):
         self.track_panel.separate_btn.setText("🔙 返回单曲模式")
         self.track_panel.separate_btn.setEnabled(True)
         self.track_panel.separate_status.setText("")
-        audio_files = sorted([os.path.join(song.stems_path, f) for f in os.listdir(song.stems_path) if f.lower().endswith(tuple(SUPPORTED_FORMATS))])
+        
         for audio_path in audio_files:
             tc = self.track_panel.add_track(audio_path)
             tc.set_playback_rate(self.playback_rate)
             self.track_controls.append(tc)
-        # 修复：为所有音轨初始化播放器，而不仅仅是第一个
+        
+        # 为所有音轨初始化播放器
         for i, tc in enumerate(self.track_controls):
             tc.setup_player()
-            # 只对第一个音轨连接媒体状态变化信号（用于检测播放结束）
-            # 注意：pygame 模式下 tc.player 为 None，需要检查
+            # QMediaPlayer 模式下，只对第一个音轨连接媒体状态变化信号
             if i == 0 and tc.player is not None:
                 tc.player.mediaStatusChanged.connect(self.on_media_status_changed)
+        
+        # 设置播放结束回调（支持pygame模式的自动下一首）
+        sync_manager = self.track_panel.get_sync_manager()
+        sync_manager.set_end_callback(self.on_song_ended)
+        
         self.play_all_tracks()
         self.is_playing = True
         self.play_btn.setText("⏸")
         self.update_timer.start(100)
+        
+        # 更新智能预加载器状态
+        if self._smart_preloader:
+            self._smart_preloader.set_playlist(self.songs)
+            self._smart_preloader.set_current_index(self.current_song_index)
+            self._smart_preloader.set_play_mode(self.play_mode)
         
     def separate_current_song(self):
         if not self.current_song:
@@ -721,6 +1143,7 @@ class MultiTrackPlayer(QMainWindow):
     def play_all_tracks(self):
         """同步播放所有音轨 - 修复版"""
         if not self.track_controls:
+            print("[播放器] 没有音轨控件，无法播放")
             return
             
         # 使用同步管理器播放
@@ -728,12 +1151,17 @@ class MultiTrackPlayer(QMainWindow):
         
         if len(self.track_controls) > 1:
             # 多音轨模式：使用同步播放
+            print(f"[播放器] 多音轨模式播放，共 {len(self.track_controls)} 个音轨")
             sync_manager.play_all_synced()
             # 启动同步监控，确保长时间播放时保持同步
             sync_manager.start_sync_monitoring()
         else:
             # 单音轨模式：直接播放
-            self.track_controls[0].play()
+            tc = self.track_controls[0]
+            print(f"[播放器] 单音轨模式播放: {tc.track_name}")
+            tc.play()
+            # 启动结束检测定时器
+            sync_manager._end_check_timer.start()
             
     def pause_all_tracks(self):
         """同步暂停所有音轨"""
@@ -749,14 +1177,21 @@ class MultiTrackPlayer(QMainWindow):
             
     def toggle_play(self):
         if not self.track_controls:
-            if self.song_list.song_model.rowCount() > 0:
+            # 没有音轨控件，尝试播放第一首歌
+            row_count = self.song_list.song_model.rowCount()
+            print(f"[播放器] 切换播放状态，当前无音轨，列表中有 {row_count} 首歌")
+            if row_count > 0:
                 self.play_song_at_index(0)
+            else:
+                print("[播放器] 歌曲列表为空，无法播放")
             return
         if self.is_playing:
+            print("[播放器] 暂停播放")
             self.pause_all_tracks()
             self.play_btn.setText("▶")
             self.update_timer.stop()
         else:
+            print("[播放器] 恢复播放")
             self.play_all_tracks()
             self.play_btn.setText("⏸")
             self.update_timer.start(100)
@@ -773,6 +1208,15 @@ class MultiTrackPlayer(QMainWindow):
     def play_next(self):
         if not self.songs:
             return
+        
+        # 在单曲模式（非多音轨）下，优先使用推荐系统
+        if self.mode == "single" and self._personal_recommender:
+            next_song = self._get_recommended_next_song()
+            if next_song:
+                self.play_song(next_song)
+                return
+        
+        # 如果推荐系统没有返回结果，使用默认逻辑
         if self.play_mode == "shuffle":
             self.shuffle_index += 1
             if self.shuffle_index >= len(self.shuffle_order):
@@ -783,6 +1227,66 @@ class MultiTrackPlayer(QMainWindow):
             next_index = (self.current_song_index + 1) % len(self.songs)
             next_song = self.songs[next_index]
         self.play_song(next_song)
+    
+    def _get_recommended_next_song(self):
+        """从推荐系统获取下一首歌曲 - 改进版：从Top N中随机选择"""
+        if not self._personal_recommender:
+            return None
+        
+        try:
+            # 获取当前歌曲信息
+            current_song_info = None
+            if self.current_song:
+                current_song_info = {
+                    'path': self.current_song.path,
+                    'title': self.current_song.title,
+                    'artist': self.current_song.artist,
+                    'duration': self.current_song.duration
+                }
+            
+            # 获取推荐池大小配置
+            pool_size = self.config.get('recommendation_pool_size', 20)
+            
+            # 获取推荐列表（而不是单个推荐）
+            result = self._personal_recommender.get_top_recommendations(
+                current_song_info, 
+                count=pool_size
+            )
+            
+            if result and len(result) > 0:
+                # 从推荐列表中随机选择一首
+                import random
+                selected = random.choice(result)
+                song_info, reason = selected
+                rec_path = song_info.get('path', '')
+                
+                # 在歌曲列表中查找对应的歌曲
+                for song in self.songs:
+                    if song.path == rec_path:
+                        print(f"[推荐系统] 从Top {len(result)} 中随机选择: {song.title} ({reason})")
+                        return song
+                
+                # 如果路径不在当前列表中
+                print(f"[推荐系统] 推荐的歌曲不在当前列表中: {rec_path}")
+                return None
+            else:
+                print("[推荐系统] 没有获取到推荐结果")
+                return None
+                
+        except Exception as e:
+            print(f"[推荐系统] 获取推荐失败: {e}")
+            # 回退到旧方法
+            try:
+                result = self._personal_recommender.get_next_recommendation(current_song_info)
+                if result:
+                    song_info, reason = result
+                    rec_path = song_info.get('path', '')
+                    for song in self.songs:
+                        if song.path == rec_path:
+                            return song
+            except:
+                pass
+            return None
         
     def play_previous(self):
         if not self.songs:
@@ -875,8 +1379,25 @@ class MultiTrackPlayer(QMainWindow):
         # 暂停同步监控
         sync_manager.stop_sync_monitoring()
         
+        # 记录当前播放状态
+        was_playing = self.is_playing
+        
+        # 先暂停所有音轨
+        if was_playing:
+            sync_manager.pause_all()
+        
         # 同步设置位置（这会自动处理 pygame 和 QMediaPlayer）
         sync_manager.set_all_positions_synced(position)
+        
+        # 给一点时间让位置设置生效
+        QTimer.singleShot(50, lambda: self._resume_after_seek(was_playing))
+    
+    def _resume_after_seek(self, was_playing: bool):
+        """seek后恢复播放"""
+        if was_playing and self.is_playing:
+            sync_manager = self.track_panel.get_sync_manager()
+            sync_manager.resume_all()
+            sync_manager.start_sync_monitoring()
             
     def update_progress(self):
         if not self.track_controls or self.slider_being_dragged:
@@ -907,6 +1428,12 @@ class MultiTrackPlayer(QMainWindow):
             random.shuffle(self.shuffle_order)
             self.shuffle_index = 0
             
+        # 更新预加载器的播放模式
+        if self._smart_preloader:
+            self._smart_preloader.set_play_mode(self.play_mode)
+            if self.play_mode == "shuffle":
+                self._smart_preloader.set_shuffle_state(self.shuffle_order, self.shuffle_index)
+            
     def on_speed_slider_changed(self, value: int):
         self.playback_rate = value / 100.0
         self.speed_label.setText(f"{self.playback_rate:.2f}x")
@@ -919,14 +1446,50 @@ class MultiTrackPlayer(QMainWindow):
             self.on_song_ended()
             
     def on_song_ended(self):
+        """歌曲播放结束时的处理 - 支持所有模式的自动播放"""
+        print(f"[播放器] 歌曲自然结束，当前模式: {self.play_mode}, 索引: {self.current_song_index}/{len(self.songs)}")
+        
+        # 【关键修复】歌曲自然结束 = 听完了，需要先记录 complete 行为
+        learning_enabled = self.settings.value("recommender_learning_enabled", True, type=bool)
+        if self.current_song and self._personal_recommender and learning_enabled:
+            try:
+                duration = self.current_song.duration if self.current_song.duration else 180
+                print(f"[推荐系统] 歌曲自然结束，记录为 complete: {self.current_song.title}")
+                self._personal_recommender.on_song_end(
+                    {'path': self.current_song.path, 'title': self.current_song.title, 
+                     'artist': self.current_song.artist, 'duration': duration},
+                    duration,  # 自然结束 = 听完了整首歌
+                    'complete'  # 直接标记为 complete
+                )
+            except Exception as e:
+                print(f"[推荐系统] 记录完成事件失败: {e}")
+        
+        # 设置标记，告诉 play_song 不要再记录上一首歌（已经记录过了）
+        self._skip_end_recording = True
+        
         if self.play_mode == "repeat_one" and self.current_song:
+            # 单曲循环
             self.play_song(self.current_song)
         elif self.play_mode == "shuffle":
+            # 随机播放 - 总是播放下一首
             self.play_next()
-        elif self.current_song_index < len(self.songs) - 1:
-            self.play_next()
+        elif self.play_mode == "sequential":
+            # 顺序播放 - 修复：播放到最后一首后停止，否则播放下一首
+            if self.current_song_index < len(self.songs) - 1:
+                self.play_next()
+            else:
+                # 播放列表结束
+                print("[播放器] 播放列表已结束")
+                self.stop_playback()
         else:
-            self.stop_playback()
+            # 默认：顺序播放
+            if self.current_song_index < len(self.songs) - 1:
+                self.play_next()
+            else:
+                self.stop_playback()
+        
+        # 重置标记
+        self._skip_end_recording = False
             
     def open_online_search(self):
         dialog = OnlineSearchDialog(self.lx_client, self)
@@ -1008,6 +1571,19 @@ class MultiTrackPlayer(QMainWindow):
             self.config.update(dialog.get_config())
             self._save_config()
     
+    def open_recommender_debug(self):
+        """打开推荐系统调试对话框"""
+        dialog = RecommenderDebugDialog(self._personal_recommender, self.settings, self)
+        dialog.exec()
+    
+    def _on_preload_finished(self, file_path: str, success: bool):
+        """预加载完成回调"""
+        from pathlib import Path
+        if success:
+            print(f"[预加载] ✓ 完成: {Path(file_path).name}")
+        else:
+            print(f"[预加载] ✗ 失败: {Path(file_path).name}")
+    
     def locate_current_song(self):
         """定位当前播放的歌曲在列表中的位置"""
         if not self.current_song:
@@ -1032,6 +1608,33 @@ class MultiTrackPlayer(QMainWindow):
             QMessageBox.information(self, "提示", "当前歌曲不在列表中")
             
     def closeEvent(self, event):
+        # 保存主音量设置
+        self.settings.setValue("master_volume", self.master_volume)
+        
+        # 保存播放模式
+        self.settings.setValue("play_mode", self.play_mode)
+        self.settings.setValue("playback_rate", self.playback_rate)
+        
+        # 保存个人推荐系统数据
+        if self._personal_recommender:
+            try:
+                self._personal_recommender.save()
+                print("[推荐系统] 数据已保存")
+            except Exception as e:
+                print(f"[推荐系统] 保存失败: {e}")
+        
+        # 清理全局快捷键监听器
+        if hasattr(self, '_hotkey_listener') and self._hotkey_listener:
+            try:
+                self._hotkey_listener.stop()
+                print("[快捷键] 全局快捷键已停止")
+            except:
+                pass
+        
+        # 清理预加载器
+        if hasattr(self, '_preloader') and self._preloader:
+            self._preloader.shutdown()
+        
         self.stop_all_tracks()
         self.cleanup_tracks()
         if self.scanner and self.scanner.isRunning():

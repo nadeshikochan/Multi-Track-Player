@@ -1,0 +1,226 @@
+[
+  {
+    "song_path": "F:/音乐文件\\lx.music\\part1\\Chelsea Rodgers - Prince.flac",
+    "timestamp": 1766346474.1506445,
+    "duration": 341.106,
+    "listen_time": 20.619,
+    "action": "skip_early",
+    "prev_song_path": ""
+  },
+  {
+    "song_path": "F:/音乐文件\\MusicDownloader\\ogg_music\\ANANT-GARDE EYES - 告白.ogg",
+    "timestamp": 1766346502.2026722,
+    "duration": 180.306,
+    "listen_time": 180.306,
+    "action": "complete",
+    "prev_song_path": ""
+  },
+  {
+    "song_path": "F:/音乐文件\\MusicDownloader\\ogg_music\\bermei.inazawa - 斜阳.ogg",
+    "timestamp": 1766346517.976507,
+    "duration": 198.97,
+    "listen_time": 198.97,
+    "action": "complete",
+    "prev_song_path": ""
+  },
+  {
+    "song_path": "F:/音乐文件\\lx.music\\part5_25.8.13\\Tricky.mp3",
+    "timestamp": 1766346526.2650797,
+    "duration": 128.208,
+    "listen_time": 8.281,
+    "action": "skip_early",
+    "prev_song_path": ""
+  },
+  {
+    "song_path": "F:/音乐文件\\MusicDownloader\\ogg_music\\Richard Clayderman - 拉拉主题曲.ogg",
+    "timestamp": 1766346530.837658,
+    "duration": 156.173,
+    "listen_time": 156.173,
+    "action": "complete",
+    "prev_song_path": ""
+  },
+  {
+    "song_path": "F:/音乐文件\\lx.music\\part4\\Mines (Magical Shoes).mp3",
+    "timestamp": 1766346546.573465,
+    "duration": 107.624,
+    "listen_time": 15.726,
+    "action": "skip_mid",
+    "prev_song_path": ""
+  },
+  {
+    "song_path": "F:/音乐文件\\MusicDownloader\\ogg_music\\WHITE-LIPS - 初恋.ogg",
+    "timestamp": 1766346553.7689693,
+    "duration": 316.892,
+    "listen_time": 316.892,
+    "action": "complete",
+    "prev_song_path": ""
+  },
+  {
+    "song_path": "F:/音乐文件\\MusicDownloader\\ogg_music\\ヨルシカ - あの夏に咲け.ogg",
+    "timestamp": 1766346558.036673,
+    "duration": 258.88,
+    "listen_time": 4.227,
+    "action": "skip_early",
+    "prev_song_path": ""
+  },
+  {
+    "song_path": "F:/音乐文件\\MusicDownloader\\ogg_music\\Horace Silver - Song For My Father.ogg",
+    "timestamp": 1766346561.4578397,
+    "duration": 438.28,
+    "listen_time": 3.408,
+    "action": "skip_early",
+    "prev_song_path": ""
+  },
+  {
+    "song_path": "F:/音乐文件\\lx.music\\part2\\再見我的愛人.mp3",
+    "timestamp": 1766346567.3543928,
+    "duration": 211.774,
+    "listen_time": 211.774,
+    "action": "complete",
+    "prev_song_path": ""
+  },
+  {
+    "song_path": "F:/音乐文件\\lx.music\\part1\\Cherish you - 矢作紗友里.flac",
+    "timestamp": 1766346620.937464,
+    "duration": 180,
+    "listen_time": 90,
+    "action": "skip_late",
+    "prev_song_path": ""
+  },
+  {
+    "song_path": "F:/音乐文件\\lx.music\\part1\\Cherish you - 矢作紗友里.flac",
+    "timestamp": 1766346620.9403489,
+    "duration": 180,
+    "listen_time": 90,
+    "action": "skip_late",
+    "prev_song_path": ""
+  },
+  {
+    "song_path": "F:/音乐文件\\MusicDownloader\\ogg_music\\Richard Clayderman - 拉拉主题曲.ogg",
+    "timestamp": 1766346620.941134,
+    "duration": 180,
+    "listen_time": 180,
+    "action": "end",
+    "prev_song_path": ""
+  },
+  {
+    "song_path": "F:/音乐文件\\MusicDownloader\\ogg_music\\WHITE-LIPS - 初恋.ogg",
+    "timestamp": 1766346620.942116,
+    "duration": 180,
+    "listen_time": 90,
+    "action": "skip_late",
+    "prev_song_path": ""
+  },
+  {
+    "song_path": "F:/音乐文件\\MusicDownloader\\ogg_music\\Richard Clayderman - 拉拉主题曲.ogg",
+    "timestamp": 1766346620.943667,
+    "duration": 180,
+    "listen_time": 180,
+    "action": "end",
+    "prev_song_path": ""
+  },
+  {
+    "song_path": "F:/音乐文件\\MusicDownloader\\ogg_music\\ヨルシカ - あの夏に咲け.ogg",
+    "timestamp": 1766346620.9452453,
+    "duration": 180,
+    "listen_time": 90,
+    "action": "skip_late",
+    "prev_song_path": ""
+  },
+  {
+    "song_path": "F:/音乐文件\\lx.music\\part5_25.8.13\\Tricky.mp3",
+    "timestamp": 1766346620.9477978,
+    "duration": 180,
+    "listen_time": 4,
+    "action": "skip_early",
+    "prev_song_path": ""
+  },
+  {
+    "song_path": "F:/音乐文件\\MusicDownloader\\ogg_music\\bermei.inazawa - 斜阳.ogg",
+    "timestamp": 1766346620.9498544,
+    "duration": 180,
+    "listen_time": 90,
+    "action": "skip_late",
+    "prev_song_path": ""
+  },
+  {
+    "song_path": "F:/音乐文件\\MusicDownloader\\ogg_music\\ヨルシカ - あの夏に咲け.ogg",
+    "timestamp": 1766346620.952297,
+    "duration": 180,
+    "listen_time": 90,
+    "action": "skip_late",
+    "prev_song_path": ""
+  },
+  {
+    "song_path": "F:/音乐文件\\MusicDownloader\\ogg_music\\Horace Silver - Song For My Father.ogg",
+    "timestamp": 1766346620.9544666,
+    "duration": 180,
+    "listen_time": 90,
+    "action": "skip_late",
+    "prev_song_path": ""
+  },
+  {
+    "song_path": "F:/音乐文件\\lx.music\\part2\\再見我的愛人.mp3",
+    "timestamp": 1766382985.0116572,
+    "duration": 180,
+    "listen_time": 5,
+    "action": "skip_early",
+    "prev_song_path": ""
+  },
+  {
+    "song_path": "F:/音乐文件\\MusicDownloader\\ogg_music\\Richard Clayderman - 拉拉主题曲.ogg",
+    "timestamp": 1766382986.0115252,
+    "duration": 180,
+    "listen_time": 180,
+    "action": "complete",
+    "prev_song_path": "F:/音乐文件\\lx.music\\part2\\再見我的愛人.mp3"
+  },
+  {
+    "song_path": "F:/音乐文件\\MusicDownloader\\ogg_music\\bermei.inazawa - 斜阳.ogg",
+    "timestamp": 1766382986.747052,
+    "duration": 180,
+    "listen_time": 180,
+    "action": "complete",
+    "prev_song_path": "F:/音乐文件\\MusicDownloader\\ogg_music\\Richard Clayderman - 拉拉主题曲.ogg"
+  },
+  {
+    "song_path": "F:/音乐文件\\MusicDownloader\\ogg_music\\WHITE-LIPS - 初恋.ogg",
+    "timestamp": 1766382989.003367,
+    "duration": 180,
+    "listen_time": 180,
+    "action": "complete",
+    "prev_song_path": "F:/音乐文件\\MusicDownloader\\ogg_music\\bermei.inazawa - 斜阳.ogg"
+  },
+  {
+    "song_path": "F:/音乐文件\\lx.music\\part1\\Cherish you - 矢作紗友里.flac",
+    "timestamp": 1766383001.0592687,
+    "duration": 180,
+    "listen_time": 5,
+    "action": "skip_early",
+    "prev_song_path": "F:/音乐文件\\MusicDownloader\\ogg_music\\WHITE-LIPS - 初恋.ogg"
+  },
+  {
+    "song_path": "F:/音乐文件\\lx.music\\part1\\Chelsea Rodgers - Prince.flac",
+    "timestamp": 1766383028.0422134,
+    "duration": 341.106,
+    "listen_time": 3.529,
+    "action": "skip_early",
+    "prev_song_path": "F:/音乐文件\\lx.music\\part1\\Cherish you - 矢作紗友里.flac"
+  },
+  {
+    "song_path": "F:/音乐文件\\lx.music\\part1\\まぼろし - 鈴木みのり.flac",
+    "timestamp": 1766383371.3064036,
+    "duration": 343.266,
+    "listen_time": 343.266,
+    "action": "complete",
+    "prev_song_path": "F:/音乐文件\\lx.music\\part1\\Chelsea Rodgers - Prince.flac"
+  },
+  {
+    "song_path": "F:/音乐文件\\MusicDownloader\\ogg_music\\ヨルシカ - あの夏に咲け.ogg",
+    "timestamp": 1766383631.585617,
+    "duration": 258.88,
+    "listen_time": 258.88,
+    "action": "complete",
+    "prev_song_path": "F:/音乐文件\\lx.music\\part1\\まぼろし - 鈴木みのり.flac"
+  }
+]

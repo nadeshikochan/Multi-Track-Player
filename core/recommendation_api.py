@@ -334,7 +334,7 @@ class RecommendationAPIServer:
             self.server = HTTPServer(('127.0.0.1', self.port), RecommendationAPIHandler)
             self.thread = threading.Thread(target=self.server.serve_forever, daemon=True)
             self.thread.start()
-            print(f"推荐API服务器已启动: http://127.0.0.1:{self.port}")
+            print(f"[播放器内置API] 推荐接口已启动 (端口: {self.port})")
         except Exception as e:
             print(f"推荐API服务器启动失败: {e}")
             
