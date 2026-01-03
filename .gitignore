@@ -4,3 +4,5 @@ fixed_player/
 track_output/
 .idea/
 multi_track_player详细注释版/
+*.pyc
+pycache/
